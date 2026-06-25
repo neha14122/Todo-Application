@@ -1,0 +1,18 @@
+# ASP.NET
+**/bin/
+**/obj/
+
+# React
+**/node_modules/
+**/build/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
