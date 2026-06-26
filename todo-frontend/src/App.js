@@ -13,9 +13,6 @@ import {
 import "./App.css";
 
 function App() {
-  // ==========================
-  // State
-  // ==========================
 
   const [todos, setTodos] = useState([]);
 
@@ -27,9 +24,7 @@ function App() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [editingId, setEditingId] = useState(null);
 
-  // ==========================
-  // Data Loading
-  // ==========================
+  const [errorMessage, setErrorMessage] = useState("");
 
   const loadTodos = async () => {
     try {
@@ -40,17 +35,9 @@ function App() {
     }
   };
 
-  // ==========================
-  // Effects
-  // ==========================
-
   useEffect(() => {
     loadTodos();
   }, []);
-
-  // ==========================
-  // CRUD Operations
-  // ==========================
 
   const handleAddTodo = async () => {
     try {
@@ -68,8 +55,9 @@ function App() {
       } else {
         await addTodo(todo);
       }
-
       await loadTodos();
+
+      setErrorMessage("");
 
       setTitle("");
       setDescription("");
@@ -77,7 +65,11 @@ function App() {
       setCategory("Personal");
       setSearchKeyword("");
     } catch (error) {
-      console.error(error);
+      if (error.response) {
+        setErrorMessage(error.response.data);
+      } else {
+        setErrorMessage("Something went wrong.");
+      }
     }
   };
 
@@ -99,27 +91,20 @@ function App() {
     setCategory(todo.category);
   };
 
-  // ==========================
-  // Search
-  // ==========================
-
   const handleSearch = async () => {
     try {
       if (searchKeyword.trim() === "") {
-        loadTodos();
+        setErrorMessage("Please enter a keyword to search.");
         return;
       }
 
+      setErrorMessage("");
       const response = await searchTodos(searchKeyword);
       setTodos(response.data);
     } catch (error) {
       console.error(error);
     }
   };
-
-  // ==========================
-  // Filters
-  // ==========================
 
   const handleCategoryFilter = async (category) => {
     try {
@@ -139,13 +124,15 @@ function App() {
     }
   };
 
-  // ==========================
-  // UI
-  // ==========================
-
   return (
     <div className="todo-container">
       <h1>Todo Application</h1>
+
+      {errorMessage && (
+        <p style={{ color: "red", fontWeight: "bold" }}>
+          {errorMessage}
+        </p>
+      )}
 
       {/* Search Section */}
 

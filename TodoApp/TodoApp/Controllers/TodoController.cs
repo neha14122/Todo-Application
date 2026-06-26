@@ -19,8 +19,8 @@ namespace TodoApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAll()
         {
-                var todos = _todoService.GetAll();
-                return Ok(todos);
+            var todos = _todoService.GetAll();
+            return Ok(todos);
         }
 
         [HttpGet("{id}")]
@@ -28,77 +28,83 @@ namespace TodoApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetById(int id)
         {
-                var todo = _todoService.GetById(id);
-                if (todo == null)
-                    return NotFound("Todo not found");
+            var todo = _todoService.GetById(id);
+            if (todo == null)
+                return NotFound("Todo not found");
 
-                return Ok(todo);
+            return Ok(todo);
         }
 
         [HttpPost]
         public IActionResult Add(TodoItem todo)
         {
-             if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var createdTodo = _todoService.Add(todo);
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .FirstOrDefault();
+                return BadRequest(firstError?.ErrorMessage);
+            }
+            var createdTodo = _todoService.Add(todo);
 
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id = createdTodo.Id },
-                    createdTodo);
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdTodo.Id },
+                createdTodo);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, TodoItem todo)
         {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var updated = _todoService.Update(id, todo);
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .FirstOrDefault();
+                return BadRequest(firstError?.ErrorMessage);
+            }
+            var updated = _todoService.Update(id, todo);
 
-                if (!updated)
-                    return NotFound("Todo not found");
+            if (!updated)
+                return NotFound("Todo not found");
 
-                return Ok("Todo updated successfully");
+            return Ok("Todo updated successfully");
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-           
-                var deleted = _todoService.Delete(id);
 
-                if (!deleted)
-                    return NotFound("Todo not found");
+            var deleted = _todoService.Delete(id);
 
-                return Ok("Todo deleted successfully");
-           
+            if (!deleted)
+                return NotFound("Todo not found");
+
+            return Ok("Todo deleted successfully");
+
         }
 
         [HttpGet("search/{keyword}")]
         public IActionResult Search(string keyword)
         {
-                var results = _todoService.Search(keyword);
+            var results = _todoService.Search(keyword);
 
-                return Ok(results);
+            return Ok(results);
         }
 
         [HttpGet("category/{category}")]
         public IActionResult GetByCategory(string category)
         {
-                var todos = _todoService.GetByCategory(category);
+            var todos = _todoService.GetByCategory(category);
 
-                return Ok(todos);
+            return Ok(todos);
         }
 
         [HttpGet("priority/{priority}")]
         public IActionResult GetByPriority(string priority)
         {
-                var todos = _todoService.GetByPriority(priority);
-                return Ok(todos);
+            var todos = _todoService.GetByPriority(priority);
+            return Ok(todos);
         }
     }
 }
